@@ -1,11 +1,10 @@
 import os
 import logging
 import requests
-from zoneinfo import ZoneInfo
-ept importError:
- from backports.zoneinfo import zoneinfo 
+import pytz
 
-logger = logging.getLogger("daily-10-tips")
+logger = logging.getlogger("daily-10-tips")
+WAT =pytz.timezone("Africa/Lagos")
 
 # Production API Endpoint Configurations
 SPORTS_URL = "https://the-odds-api.com"
