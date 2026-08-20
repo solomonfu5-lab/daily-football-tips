@@ -2,6 +2,8 @@ import os
 import logging
 import requests
 from zoneinfo import ZoneInfo
+ept importError:
+ from backports.zoneinfo import zoneinfo 
 
 logger = logging.getLogger("daily-10-tips")
 
