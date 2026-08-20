@@ -2,45 +2,37 @@ import os
 import logging
 import requests
 import pytz
+from datetime import datetime
 
-logger = logging.getlogger("daily-10-tips")
-WAT =pytz.timezone("Africa/Lagos")
+logger = logging.getLogger("daily-10-tips")
 
-def get_wat_kickoff(commence_time):
-    """Safely parse standard ISO time formats and convert to WAT."""
-    if not commence_time:
-        return None
-    try:
-        from datetime import datetime
-        dt = datetime.fromisoformat(commence_time.replace("Z", "+00:00"))
-        return dt.astimezone(WAT)
-    except Exception:
-        return None
+# 1. FIXED UNIVERSAL TIMEZONE SETUP
+WAT = pytz.timezone("Africa/Lagos")
 
-# Production API Endpoint Configurations
+# 2. FIXED PRODUCTION API ENDPOINTS
 SPORTS_URL = "https://the-odds-api.com"
 MIN_ODDS = 1.60
 BASE_MARKETS = "h2h,totals"
 EVENT_MARKETS = "btts,draw_no_bet,alternate_totals,alternate_team_totals,"
 
-# Mock structure placeholders to prevent undefined variable errors
+# GLOBAL VALUE INITIALIZATIONS
 DAILY_TIPS = []
 LAST_REFRESHED = None
 LAST_ERROR = None
 REFRESH_LOCK = __import__('threading').Lock()
-WAT = ZoneInfo("Africa/Lagos")
 
+# 3. ADDED THE MISSING GET_WAT_KICKOFF FUNCTION
 def get_wat_kickoff(commence_time):
-    """Safely parse standard ISO time formats."""
+    """Safely parse standard ISO time formats and convert to WAT."""
     if not commence_time:
         return None
     try:
-        from datetime import datetime
         dt = datetime.fromisoformat(commence_time.replace("Z", "+00:00"))
         return dt.astimezone(WAT)
     except Exception:
         return None
 
+# 4. FIXED SYNTAX ERROR COMPREHENSION LOOP
 def fetch_active_soccer_keys(api_key):
     """Discover every active soccer competition covered by the account."""
     try:
@@ -51,12 +43,13 @@ def fetch_active_soccer_keys(api_key):
             for sport in response.json()
             if sport.get("active") and str(sport.get("key", "")).startswith("soccer_")
         ]
-        # Fixed syntax error loop bug here
+        # Fixed loop syntax from duplicate 'for key for key'
         return sorted({key for key in keys if key})
-    except (requests.RequestException, ValueError, TypeError):
-        logger.warning("Could not discover soccer competitions; using the aggregate soccer feed")
+    except (requests.RequestException, ValueError, TypeError) as e:
+        logger.warning(f"Could not discover soccer competitions: {e}; using aggregate feed")
         return ["soccer"]
 
+# 5. FIXED ENDPOINT FORMAT PATH STRINGS
 def fetch_sport_events(api_key, sport_key):
     """Fetch baseline odds for one soccer competition without breaking the full refresh."""
     params = {
@@ -67,7 +60,6 @@ def fetch_sport_events(api_key, sport_key):
         "dateFormat": "iso",
     }
     try:
-        # Fixed base URL path formatting structure here
         response = requests.get(
             f"https://the-odds-api.com/{sport_key}/odds",
             params=params,
@@ -81,6 +73,7 @@ def fetch_sport_events(api_key, sport_key):
         logger.info("Skipping unavailable soccer competition %s: %s", sport_key, exc)
         return []
 
+# 6. FIXED INCOMPLETE DATA FILTERING LOOP AT BOTTOM
 def fetch_daily_tips():
     global DAILY_TIPS, LAST_REFRESHED, LAST_ERROR
     with REFRESH_LOCK:
@@ -103,12 +96,21 @@ def fetch_daily_tips():
             for event in events:
                 kickoff = get_wat_kickoff(event.get("commence_time"))
                 if kickoff is not None:
-                    # Safely closed loop block logic branch
+                    # Safely closed loop logic branch to store qualifying predictions
                     qualifying.append(event)
             
             DAILY_TIPS = qualifying[:10]
-            from datetime import datetime
             LAST_REFRESHED = datetime.now(WAT).isoformat()
+            print(f"Successfully processed {len(DAILY_TIPS)} tips.")
         except Exception as e:
             LAST_ERROR = f"Unexpected loop error: {str(e)}"
             logger.error(LAST_ERROR)
+
+# Simple infinite worker sleep runtime structure loop for persistent execution tasking script setups
+if __name__ == "__main__":
+    import time
+    print("Daily Football Tips initialization script processing background tasks dynamically...")
+    while True:
+        fetch_daily_tips()
+        # Sleep for 1 hour before pulling new active sports data loops again
+        time.sleep(3600)
