@@ -114,3 +114,4 @@ if __name__ == "__main__":
         fetch_daily_tips()
         # Sleep for 1 hour before pulling new active sports data loops again
         time.sleep(3600)
+
