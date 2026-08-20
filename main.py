@@ -6,6 +6,17 @@ import pytz
 logger = logging.getlogger("daily-10-tips")
 WAT =pytz.timezone("Africa/Lagos")
 
+def get_wat_kickoff(commence_time):
+    """Safely parse standard ISO time formats and convert to WAT."""
+    if not commence_time:
+        return None
+    try:
+        from datetime import datetime
+        dt = datetime.fromisoformat(commence_time.replace("Z", "+00:00"))
+        return dt.astimezone(WAT)
+    except Exception:
+        return None
+
 # Production API Endpoint Configurations
 SPORTS_URL = "https://the-odds-api.com"
 MIN_ODDS = 1.60
